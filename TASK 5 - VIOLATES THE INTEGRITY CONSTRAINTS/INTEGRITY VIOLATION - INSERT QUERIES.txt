@@ -1,0 +1,18 @@
+// Here we see Entity Integrity Constraint since we have inserted a NULL value in place of ssn.
+
+MariaDB [company]> INSERT INTO dependent VALUES (NULL,"Johhny123","M",1992-06-04,"Son");
+ERROR 1048 (23000): Column 'essn' cannot be null
+
+
+// Here we see a Key Constraint because we are seeing "987654321-Johnny" being inserted again which is already stored in the database.
+
+MariaDB [company]> INSERT INTO dependent VALUES (987654321,"Johnny","M",1995-06-04,"Son");
+ERROR 1062 (23000): Duplicate entry '987654321-Johnny' for key 'PRIMARY'
+
+
+// Here we see a Foreign Key Constraint while inserting a new SSN which is actually not present in the employee.ssn field.
+
+MariaDB [company]> INSERT INTO dependent VALUES (9876543212,"Johnny","M",1995-06-04,"Son");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`company`.`dependent`, CONSTRAINT `dependent_ibfk_1` FOREIGN KEY (`essn`) REFERENCES `employee` (`ssn`))
+
+MariaDB [company]> notee

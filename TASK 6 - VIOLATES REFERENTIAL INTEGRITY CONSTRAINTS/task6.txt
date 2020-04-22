@@ -1,0 +1,5 @@
+// ON DELETING THE RECORD WITH PROJECT NAME CHASIS WE ENCOUNTER THE REFERENTIAL INTEGRITY CONSTRAINT.
+
+MariaDB [company]> DELETE FROM project WHERE pname="Chasis";
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`works_on`, CONSTRAINT `works_on_ibfk_2` FOREIGN KEY (`pno`) REFERENCES `project` (`pnumber`))
+MariaDB [company]> notee

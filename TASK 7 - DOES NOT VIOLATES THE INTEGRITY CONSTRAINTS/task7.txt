@@ -1,0 +1,34 @@
+// Here, the dependent named Jamiliya is added successfully since the ssn linked to the employee is referenced. 
+MariaDB [company]> INSERT INTO dependent VALUES (321654987,"Jamiliya","F",1995-06-04,"Daughter");
+Query OK, 1 row affected, 1 warning (0.006 sec)
+
+// Here, the dependent named Henil is added successfully since the ssn linked to the employee is referenced perfectly. 
+MariaDB [company]> INSERT INTO dependent VALUES (321654987,"Henil","M",1999-06-04,"Son");
+Query OK, 1 row affected, 1 warning (0.002 sec)
+
+// Here, the dependent named Reny is added successfully since the ssn linked to the employee is referenced perfectly. 
+MariaDB [company]> INSERT INTO dependent VALUES (888776666,"Reny","F",1995-06-04,"Daughter");
+Query OK, 1 row affected, 1 warning (0.006 sec)
+
+
+// AFTER INSERTING THE ABOVE VALLUES
+
+MariaDB [company]> SELECT * FROM dependent;
++-----------+----------------+------+------------+--------------+
+| essn      | dependent_name | sex  | bdate      | relationship |
++-----------+----------------+------+------------+--------------+
+| 321654987 | Henil          | M    | 0000-00-00 | Son          |
+| 321654987 | Jamiliya       | F    | 0000-00-00 | Daughter     |
+| 321654987 | Rinkiya        | M    | 1948-07-28 | Spouse       |
+| 888776666 | Jennice        | F    | 1989-01-05 | Daughter     |
+| 888776666 | Jessica        | F    | 1960-12-03 | Spouse       |
+| 888776666 | Otto           | M    | 1988-11-25 | Son          |
+| 888776666 | Reny           | F    | 0000-00-00 | Daughter     |
+| 987654321 | Avril          | F    | 1969-09-05 | Spouse       |
+| 987654321 | Jennice        | F    | 0000-00-00 | Daughter     |
+| 987654321 | Johnny         | M    | 0000-00-00 | Son          |
+| 987654321 | Mikkel         | M    | 1986-06-04 | Son          |
++-----------+----------------+------+------------+--------------+
+11 rows in set (0.001 sec)
+
+MariaDB [company]> notee

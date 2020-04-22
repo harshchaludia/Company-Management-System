@@ -1,0 +1,201 @@
+MariaDB [company]> use company
+Database changed
+
+
+// Select all the attributes for all employees whose last name is 'Jones' or ‘James’.
+
+MariaDB [company]> SELECT * FROM employee WHERE lname="Jones" OR lname="James";
++--------+-------+-------+-----------+------------+----------------------+------+--------+-----------+------+
+| fname  | minit | lname | ssn       | bdate      | address              | sex  | salary | super_ssn | dno  |
++--------+-------+-------+-----------+------------+----------------------+------+--------+-----------+------+
+| Richie | W     | Jones | 666666603 | 1985-02-17 | 345 Levnie Frisco TX | M    |  28000 |      NULL |    5 |
++--------+-------+-------+-----------+------------+----------------------+------+--------+-----------+------+
+1 row in set (0.001 sec)
+
+
+
+
+// Select all the attributes for all employees whose first name is 'Kim' or ‘Wilson’.
+
+MariaDB [company]> SELECT * FROM employee WHERE fname="Kim" OR fname="Wilson";
++--------+-------+----------+-----------+------------+-------------------------+------+--------+-----------+------+
+| fname  | minit | lname    | ssn       | bdate      | address                 | sex  | salary | super_ssn | dno  |
++--------+-------+----------+-----------+------------+-------------------------+------+--------+-----------+------+
+| Wilson | L     | Michaels | 666666608 | 1970-07-09 | 7142 Patel, McKinney TX | F    |  65000 |      NULL | NULL |
+| Kim    | T     | Keys     | 999887777 | 1967-09-19 | 5693 Castle Spring TX   | F    |  30000 | 321654987 |    4 |
++--------+-------+----------+-----------+------------+-------------------------+------+--------+-----------+------+
+2 rows in set (0.001 sec)
+
+
+
+
+// Select the names and Ssn of employees who work on more than one project and count the total hours that the employees work on. 
+
+MariaDB [company]> SELECT E.fname,E.minit,E.lname,E.ssn,SUM(W.hours) FROM employee as E, works_on as W WHERE E.ssn=W.essn GROUP BY E.ssn HAVING count(W.pno)>1 ;
++----------+-------+-----------+-----------+--------------+
+| fname    | minit | lname     | ssn       | SUM(W.hours) |
++----------+-------+-----------+-----------+--------------+
+| Jennifer | R     | Goodwin   | 321654987 |           43 |
+| Randy    | O     | Molly     | 453453453 |           50 |
+| Utkarsh  | P     | Shanatanu | 666884444 |           67 |
+| Chaplin  | N     | Hong      | 888776666 |           47 |
+| Jordan   | M     | Smolders  | 987654321 |           36 |
+| Mohammed | S     | Farriya   | 987987987 |           43 |
+| Kim      | T     | Keys      | 999887777 |           47 |
++----------+-------+-----------+-----------+--------------+
+7 rows in set (0.001 sec)
+
+
+
+
+// For each PROJECT, retrieve the project name, number, and location plus the number of employees who works on the project.
+
+MariaDB [company]> SELECT P.pname, P.pnumber, P.plocation, count(*)  FROM project as P, department as D, employee as E WHERE P.dnum=D.dnumber AND D.mgr_ssn=E.super_ssn GROUP BY P.pnumber;
++--------+---------+-----------+----------+
+| pname  | pnumber | plocation | count(*) |
++--------+---------+-----------+----------+
+| Chasis |       1 | Frisco    |        3 |
+| Brakes |       2 | Mckinney  |        3 |
+| Vinyl  |       3 | Allen     |        3 |
+| Fender |       4 | Waco      |        2 |
+| Bonet  |       5 | Allen     |        3 |
+| Engine |       6 | Waco      |        2 |
++--------+---------+-----------+----------+
+6 rows in set (0.001 sec)
+
+
+
+
+// For each employee who works in department 5 on a project in Houston, retrieve the employee’s Ssn, first and last names, and the project number, name, and hours for each project that the employee works on.
+
+MariaDB [company]> SELECT E.ssn, E.fname, E.lname, P.pnumber, P.pname, W.hours FROM employee as E, dept_locations as DE, project as P, department as D, works_on as W WHERE E.ssn=W.essn AND W.pno=P.pnumber AND D.dnumber=5 AND P.plocation="HOUSTON" GROUP BY E.ssn;
++-----------+---------+-----------+---------+--------+-------+
+| ssn       | fname   | lname     | pnumber | pname  | hours |
++-----------+---------+-----------+---------+--------+-------+
+| 453453453 | Randy   | Molly     |       1 | Chasis |    25 |
+| 666884444 | Utkarsh | Shanatanu |       1 | Chasis |    25 |
+| 987654321 | Jordan  | Smolders  |       1 | Chasis |    30 |
++-----------+---------+-----------+---------+--------+-------+
+3 rows in set (0.018 sec)
+
+
+
+
+// Retrieve the last name and first name of all employees who work more than 40 hours per week total (on all their projects)
+
+MariaDB [company]> SELECT E.ssn, E.lname, E.fname FROM employee as E, works_on as W WHERE E.ssn=W.essn GROUP BY E.ssn HAVING count(W.hours>40);
++-----------+-----------+----------+
+| ssn       | lname     | fname    |
++-----------+-----------+----------+
+| 321654987 | Goodwin   | Jennifer |
+| 453453453 | Molly     | Randy    |
+| 666884444 | Shanatanu | Utkarsh  |
+| 888776666 | Hong      | Chaplin  |
+| 987654321 | Smolders  | Jordan   |
+| 987987987 | Farriya   | Mohammed |
+| 999887777 | Keys      | Kim      |
++-----------+-----------+----------+
+7 rows in set (0.001 sec)
+
+
+
+// Select the first and last name of each employee who is a supervisor, plus count the total number of employees supervised by each supervisor.
+
+MariaDB [company]> SELECT S.fname AS S_FNAME, S.lname AS S_LNAME, count(*) as supervising FROM EMPLOYEE AS E, EMPLOYEE AS S WHERE E.super_ssn = S.ssn GROUP BY S.ssn;
++----------+---------+-------------+
+| S_FNAME  | S_LNAME | supervising |
++----------+---------+-------------+
+| Jennifer | Goodwin |           2 |
+| Richie   | Jones   |           1 |
+| David    | Jorg    |           3 |
+| Chaplin  | Hong    |           3 |
++----------+---------+-------------+
+4 rows in set (0.002 sec)
+
+
+
+// For each project determine the total hours that employees work on that project per week.
+
+MariaDB [company]> SELECT E.fname, E.lname, E.ssn, P.pname,W.hours FROM employee as E, works_on as W, project as P WHERE E.ssn=W.essn AND W.pno=P.pnumber;
++----------+-----------+-----------+--------+-------+
+| fname    | lname     | ssn       | pname  | hours |
++----------+-----------+-----------+--------+-------+
+| Randy    | Molly     | 453453453 | Chasis |    25 |
+| Utkarsh  | Shanatanu | 666884444 | Chasis |    25 |
+| Jordan   | Smolders  | 987654321 | Chasis |    30 |
+| Randy    | Molly     | 453453453 | Brakes |    25 |
+| Chaplin  | Hong      | 888776666 | Brakes |    12 |
+| Jordan   | Smolders  | 987654321 | Brakes |     6 |
+| Utkarsh  | Shanatanu | 666884444 | Vinyl  |    42 |
+| Chaplin  | Hong      | 888776666 | Vinyl  |    10 |
+| Chaplin  | Hong      | 888776666 | Fender |    11 |
+| Mohammed | Farriya   | 987987987 | Fender |    34 |
+| Kim      | Keys      | 999887777 | Fender |    12 |
+| Jennifer | Goodwin   | 321654987 | Bonet  |    18 |
+| David    | Jorg      | 708674444 | Bonet  |  NULL |
+| Chaplin  | Hong      | 888776666 | Bonet  |    14 |
+| Jennifer | Goodwin   | 321654987 | Engine |    25 |
+| Mohammed | Farriya   | 987987987 | Engine |     9 |
+| Kim      | Keys      | 999887777 | Engine |    35 |
++----------+-----------+-----------+--------+-------+
+17 rows in set (0.001 sec)
+
+
+
+
+// Find which employee has more than 2 dependents.
+
+MariaDB [company]> SELECT E.fname, E.lname, E.ssn, count(*) as number FROM employee as E, dependent as F WHERE E.ssn=F.essn GROUP BY E.ssn HAVING count(F.relationship)>2;
++---------+----------+-----------+----------+
+| fname   | lname    | ssn       | number   |
++---------+----------+-----------+----------+
+| Chaplin | Hong     | 888776666 |        3 |
+| Jordan  | Smolders | 987654321 |        3 |
++---------+----------+-----------+----------+
+2 rows in set (0.000 sec)
+
+
+
+
+// Find which employee has more than 1 children.
+
+MariaDB [company]> SELECT E.fname, E.lname, E.ssn FROM employee as E, dependent as F WHERE E.ssn=F.essn GROUP BY E.ssn HAVING count(F.relationship="Son" OR F.relationship="Daughter")>1;
++---------+----------+-----------+
+| fname   | lname    | ssn       |
++---------+----------+-----------+
+| Chaplin | Hong     | 888776666 |
+| Jordan  | Smolders | 987654321 |
++---------+----------+-----------+
+2 rows in set (0.001 sec)
+
+
+
+
+
+// Find all the employee who works in the department that is located in Atlanta. Select their first name and last name.
+
+MariaDB [company]> SELECT employee.fname, employee.lname, dept_locations.dlocation FROM employee, dept_locations, department WHERE dept_locations.dlocation="Atlanta" AND dept_locations.dnumber=department.dnumber AND department.dnumber=employee.dno;
++----------+---------+-----------+
+| fname    | lname   | dlocation |
++----------+---------+-----------+
+| Alex     | Sabre   | Atlanta   |
+| Mohammed | Farriya | Atlanta   |
+| Kim      | Keys    | Atlanta   |
++----------+---------+-----------+
+3 rows in set (0.001 sec)
+
+
+
+// Find all the departments located in Houston and list how many projects are their under those departments.
+
+MariaDB [company]> SELECT D.dname, D.dnumber, P.pname as Projects FROM department as D, dept_locations as DE, project as P where D.dnumber=DE.dnumber AND P.dnum=D.dnumber AND DE.dlocation="Houston" GROUP BY P.pname;
++---------+---------+----------+
+| dname   | dnumber | Projects |
++---------+---------+----------+
+| Testers |       5 | Brakes   |
+| Testers |       5 | Chasis   |
+| Testers |       5 | Vinyl    |
++---------+---------+----------+
+3 rows in set (0.018 sec)
+
+MariaDB [company]> notee

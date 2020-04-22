@@ -1,0 +1,91 @@
+//1. Insert a record ('Services', 1, '123456789', '11-AUG-2012') into DEPARTMENT.
+//ANSWER : There already exists a department number with value 1 and hence the primary key constraint is seen.
+
+MariaDB [company]> INSERT INTO department values('Services',1,'123456789','2012-08-11');
+ERROR 1062 (23000): Duplicate entry '1' for key 'PRIMARY'
+
+
+
+
+//2. Insert a record ('Purchasing', 3, '990110110', '02-FEB-2013') into DEPARTMENT.
+//ANSWER : Referential Integrity Constraint since the department with name Purchasing has no record for mgr_ssn created in employee table. Hence for this query to be implemented we need a record in employee table with ssn that references the department's mgr_ssn.
+
+MariaDB [company]> INSERT INTO department values('Purchasing',3,'990110110','2013-02-02');
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`company`.`department`, CONSTRAINT `department_ibfk_1` FOREIGN KEY (`mgr_ssn`) REFERENCES `employee` (`ssn`) ON DELETE SET NULL ON UPDATE CASCADE)
+
+
+
+
+//3. Insert a record ('Customers', 12, '333445555', '14-JAN-2013') into DEPARTMENT.
+//ANSWER : The query is implemented with no issues since there is mgr_ssn from department references the employee ssn.
+
+MariaDB [company]> INSERT INTO department values('Customers',12,'333445555','2013-02-02');
+Query OK, 1 row affected (0.005 sec)
+
+
+
+
+//4. Update the Dnumber of the DEP_LOCATIONS record with Dlocation='Seattle' to 9.
+//ANSWER : The query is implemented with no issues whatsover since its an update and ON UPDATE it is cascaded.
+
+MariaDB [company]> UPDATE dept_locations SET dnumber=9 WHERE dlocation="Seattle";
+Query OK, 1 row affected (0.005 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+
+//5. Update the Salary of the EMPLOYEE record with SSN=444444444 to 55000.
+//ANSWER : The query is implemented with no issues whatsover since the salary is an independent attribute not depending on anyone.
+
+MariaDB [company]> UPDATE employee SET salary=55000 WHERE ssn=444444444;
+Query OK, 1 row affected (0.003 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+
+//6. Insert a record ('Jane', 'B', 'Smith', '666666606', '01-MAR-1980', '3556 W Second Street,Miami,FL', 'F', 85000, '666666603', 5) into EMPLOYEE.
+//ANSWER : The query is implemented with no issues whatsover since we are entering a new record with a department number referencing to department table's dno.
+
+MariaDB [company]> INSERT INTO employee values('Jane','B','Smith','666666606','1980-03-01','3556 W Second Street, Miami, FL','F',85000,'666666603',5);
+Query OK, 1 row affected (0.007 sec)
+
+
+
+
+//7. Update the hours of the WORKS_ON record with Pno=1 for the employee with SSN='666884444' to 25.
+//ANSWER : The query is implemented with no issues whatsover since hours is an independent attribute.
+
+MariaDB [company]> UPDATE works_on SET hours=25 WHERE essn=666884444 AND pno=1;
+Query OK, 1 row affected (0.006 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+
+
+//8.1 Delete the EMPLOYEE record with Ssn= '432765098'.
+//ANSWER : The query is implemented with no issues whatsover since we have a constraint that says ON DELETE SET NULL
+
+MariaDB [company]> DELETE FROM employee WHERE ssn=432765098;
+Query OK, 1 row affected (0.006 sec)
+
+
+
+
+//8.2 Delete the DEPARTMENT record with DNUMBER = 9.
+//ANSWER : The Dnumber of department is being referenced from project, employee and dep_location. And, each of their Dno will be set null according to the foreign key constraint setting the value NULL on delete
+
+MariaDB [company]> DELETE FROM department WHERE dnumber=9;
+Query OK, 1 row affected (0.008 sec)
+
+
+
+
+//8.3 Delete all the dependents of employee with Ssn = '666666608' 
+//ANSWER : The essn of dependents is referencing ssn of employee and when the deletion is done the dependent table does not throw an error since the table is not being referenced by anyone.
+
+MariaDB [company]> DELETE FROM dependent WHERE essn IN ( SELECT ssn FROM employee WHERE ssn=666666608 );
+Query OK, 2 rows affected (0.007 sec)
+
+MariaDB [company]> notee
